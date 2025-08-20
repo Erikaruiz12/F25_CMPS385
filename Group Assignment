@@ -1,0 +1,54 @@
+//Name: Erika Ruiz
+//Date:08/20/25
+//CMPS 385
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct classes {
+	string className;
+	int numStudent;
+	int grades[200];
+	double average;
+	int gradeMax;
+	int gradeMin;
+
+};
+int main() {
+	//Define the struct 
+	classes classinfo;
+	int sum = 0;
+	// Ask for class name
+	cout << "Please enter the class name: ";
+	getline(cin, classinfo.className);
+	cout << "Please enter the number of student: ";
+	cin >> classinfo.numStudent;
+
+	for (int i = 0; i < classinfo.numStudent; i++)
+	{
+		cout << "Please enter the grade for the student" << " "<< (i + 1) << ":";
+		cin >> classinfo.grades[i];
+		if (i == 0)
+		{
+			classinfo.gradeMax = classinfo.grades[i];
+			classinfo.gradeMin = classinfo.grades[i];
+		}
+		else {
+			if (classinfo.grades[i] > classinfo.gradeMax)
+				classinfo.gradeMax = classinfo.grades[i];
+			if (classinfo.grades[i] < classinfo.gradeMin)
+				classinfo.gradeMin = classinfo.grades[i];
+
+		}
+		sum += classinfo.grades[i];
+
+	}
+	//Calculating the Average
+	classinfo.average = static_cast<double>(sum) / classinfo.numStudent;
+	//Display
+	cout << "Class Name :" << classinfo.className << " " << "Number of Students: " << classinfo.numStudent << " " << "Class Average:" << classinfo.average << " " << "Class Max: " << classinfo.gradeMax << " " << "Class Min: " << classinfo.gradeMin << endl;	system("pause");
+	return 0;
+
+
+}
