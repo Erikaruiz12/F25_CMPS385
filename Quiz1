@@ -1,0 +1,101 @@
+//Erika Ruiz
+//08/25/25
+//Data Structures
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+struct Date {
+	int day;
+	int month;
+	int year;
+
+};
+struct Appointment {
+	int id;
+	string name;
+	Date date;
+	string purpose;
+
+};
+Appointment scheduled[50];
+int counts = 0;
+
+int main() {
+	srand(time(0)); //random number generator
+	int choice =0;
+	cout << "*********** Appointment Scheduler ***********\n";
+	while (choice != 3) {
+		cout << "1. Add Appointment \n";
+		cout << "2. View Appoinment by Date \n";
+		cout << "3. Exit \n";
+		cout << "Please enter your choice: ";
+		cin >> choice;
+		if (choice == 1) {
+			if (counts >= 50) {
+				cout << "Schedule in full. Cannot add more Appointments. \n";
+			}
+			else {
+				Appointment a;
+				cout << "Name: ";
+				cin.ignore();
+				getline(cin, a.name);
+
+				cout << " Date  Ex. (DD MM YYYY): ";
+				cin >> a.date.day >> a.date.month >> a.date.year;
+				cin.ignore();
+				cout << "Purpose of Appointment: ";
+				getline(cin, a.purpose);
+
+				a.id = 1000 + rand() % 9000;
+				scheduled[counts++] = a;
+				cout << "Appointment added! ID: " << a.id << endl;
+				cout << "---------------------------------------------\n";
+			}
+		}
+		else if (choice == 2) {
+			Date d;
+			cout << "Enter the Date (DD MM YYYY): ";
+			cin >> d.day >> d.month >> d.year;
+			int find = 0;
+			cout << "Appointment on ";
+			if (d.day < 10) {
+				cout << "0";
+			}
+			cout << d.day << "/";
+			if (d.month < 10) {
+				cout << "0";
+			}
+			cout << d.month << "/";
+			cout << d.year << ":\n";
+			for (int i = 0; i < counts; i++)
+			{
+				if (scheduled[i].date.day == d.day) {
+					if (scheduled[i].date.month == d.month) {
+						if (scheduled[i].date.year == d.year) {
+							cout << "ID: " << scheduled[i].id
+								<< " | " << scheduled[i].name
+								<< " | " << scheduled[i].purpose << endl;
+							find = 1;
+						}
+					}
+				}
+				if (find == 0) {
+					cout << "No appointments for this date.\n";
+				}
+				cout << "---------------------------------------------\n";
+			}
+		}
+			else	if  (choice == 3) {
+				cout << "Thank you for using the scheduler.\n";
+
+			}
+			else {
+				cout << "Invalid choice. Please try again.";
+			}
+		}
+	
+	system("pause");
+	return 0;
+}
