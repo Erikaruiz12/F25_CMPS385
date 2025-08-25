@@ -1,0 +1,190 @@
+//Erika Ruiz
+//Assignment 1
+//CMPS 385
+
+//Add Libraries Needed
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+//Define Structs
+struct name {
+	string fName;
+	string lName;
+};
+struct scores {
+	double exam1;
+	double exam2;
+	double exam3;
+	double average;
+	char letter;
+};
+
+struct student {
+	int id;
+	name name;
+	string semester;
+	scores scores;
+};
+//set command to return letter grade
+char getLetGrade(double avg) {
+	if (avg >= 90) return 'A';
+	else if (avg >= 80) return 'B';
+	else if (avg >= 70) return 'C';
+	else if (avg >= 60) return 'D';
+	else if (avg <= 50) return 'F';
+}
+
+int main() {
+	//Definitions
+	srand(time(0)); //ID Randomation
+	student gradebook[100]; //sets  fixed-size array to 100
+	int count = 0;
+	int choice = -1; //makes sure it doesn't start with 0
+
+	while (choice != 0) {
+		cout << "*************** Faculty Gradebook ***************\n";
+		cout << "Please choose one of the following operations\n";
+		cout << "1- Add a new student record\n";
+		cout << "2- Enter/Update scores (by ID)\n";
+		cout << "3- Display report for a student (by ID)\n";
+		cout << "4- Display report for a semester\n";
+		cout << "5- List all students\n";
+		cout << "0- Exit\n";
+		cin >> choice;
+		if (choice == 1) {
+			//Add Student to Gradebook
+			student students;
+			cout << "First Name: ";
+			cin >> students.name.fName;
+			cout << "Last Name: ";
+			cin >> students.name.lName;
+			cout << "Enter a Semester: ";
+			cin.ignore();
+			getline(cin, students.semester);
+			//set students grade to 0
+			students.id = 1000 + rand() % 10000;
+			students.scores.exam1 = 0;
+			students.scores.exam2 = 0;
+			students.scores.exam3 = 0;
+			students.scores.letter = 'F';
+			students.scores.average = 0;
+			gradebook[count] = students;
+			count++;
+			cout << "Added! ID =" << students.id << endl;
+
+		}
+		else if (choice == 2) {
+			//Declration
+			int id;
+			cout << "Enter Student ID: ";
+			cin >> id;
+			//Updating Scores
+			int find = 0;
+			for (int i = 0; i < count; i++)
+			{
+				//Inputs Scores
+				if (gradebook[i].id == id) {
+					cout << "Exam 1:";
+					cin >> gradebook[i].scores.exam1;
+					cout << "Exam 2:";
+					cin >> gradebook[i].scores.exam2;
+					cout << "Exam 3:";
+					cin >> gradebook[i].scores.exam3;
+					//Calculate Letter grade
+					gradebook[i].scores.average = (gradebook[i].scores.exam1 + gradebook[i].scores.exam2 + gradebook[i].scores.exam3) / 3.0;
+					gradebook[i].scores.letter = getLetGrade(gradebook[i].scores.average);
+					cout << "Updated! Average = " << fixed << setprecision(2) << gradebook[i].scores.average << "Letter Grade = " << gradebook[i].scores.letter << endl;
+					find = 1;
+				}
+			}
+			if (find == 0) cout << "Student could not be found.\n";
+
+		}
+		else if (choice == 3) {
+			//Declaration
+			int id;
+			int find = 0;
+			//Out statement
+			cout << "Enter Student ID: ";
+			cin >> id;
+			for (int i = 0; i < count; i++)
+			{
+				if (gradebook[i].id == id) {
+					cout << "---------- Student Report ---------\n";
+					cout << "Name: " << gradebook[i].name.lName << "," << gradebook[i].name.fName << endl;
+					cout << "ID: " << gradebook[i].id << endl;
+					cout << "Semester: " << gradebook[i].semester << endl;
+					cout << "Exam 1: " << gradebook[i].scores.exam1 << endl;
+					cout << "Exam 2: " << gradebook[i].scores.exam2 << endl;
+					cout << "Exam 3: " << gradebook[i].scores.exam3 << endl;
+					cout << "Average: " << fixed << setprecision(2) << gradebook[i].scores.average << endl;
+					cout << "Letter: " << gradebook[i].scores.letter << endl;
+					cout << "------------------------------\n";
+					find = 1;
+
+				}
+			}
+			if (find == 0) cout << "Student could not be found.\n";
+		}
+		else if (choice == 4) {
+			//Declaration
+			int find = 0;
+			int counter = 0;
+			double total = 0;
+			double highest = -1;
+			double lowest = 101;
+
+			string semester;
+			cout << "Enter Semester: ";
+			cin.ignore();
+			getline(cin, semester);
+			cout << "ID | Name|Exam1 Exam2 Exam3|Average|Letter Grade\n";
+			for (int i = 0; i < count; i++)
+			{
+				if (gradebook[i].semester == semester) {
+					find = 1;
+					counter++;
+					double avg = gradebook[i].scores.average;
+					total += avg;
+					if (avg > highest)highest = avg;
+					if (avg < lowest)lowest = avg;
+					cout << gradebook[i].id << "|" << gradebook[i].name.fName << "," << gradebook[i].name.lName << " | " << gradebook[i].scores.exam1 << " " << gradebook[i].scores.exam2 << " " << gradebook[i].scores.exam3 << " | " << fixed << setprecision(2) << avg << " | " << gradebook[i].scores.letter << endl;
+
+
+				}
+			}
+			if (find == 1) {
+				cout << "Students: " << counter << endl;
+				cout << "Semester Average: " << total / counter << endl;
+				cout << "Highest Average: " << highest << endl;
+				cout << "Lowest Average: " << lowest << endl;
+
+			}
+			else {
+				cout << "No records for that semester.";
+			}
+
+		}
+		else if (choice == 5) {
+			if (count == 0) {
+				cout << "No students yet.\n";
+			}
+			else {
+				cout << "ID | Name |Semester\n";
+				for (int i = 0; i < count; i++) {
+					cout << gradebook[i].id << " | " << gradebook[i].name.fName << ", " << gradebook[i].name.lName << " | " << gradebook[i].semester << endl;
+
+				}
+
+			}
+		}
+	}
+	cout << "Goodbye!\n";
+	system("pause");
+	return 0;
+
+}
