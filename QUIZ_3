@@ -1,0 +1,153 @@
+/*/Erika Ruiz
+9/22/25
+Quiz 3
+Data Structures*/
+#include <iostream>
+#include<string>
+
+using namespace std;
+class Item {
+private:
+	string name;
+	double price;
+
+protected:
+	Item(string n, double p) {
+		n = name;
+		p = price;
+	}
+public:
+	virtual ~Item() {} 
+	string getName() const { return name; }
+	virtual void display() const = 0;
+	virtual double getPrice() const { return price; }
+	virtual void receiptEntry() const = 0;
+};
+
+class FoodItem : public Item {
+private:
+	string expirationDate;
+
+public:
+	FoodItem(string n, double p, string exp) : Item(n, p) 
+	{
+		expirationDate=exp;
+	}
+
+	void display() const override {
+		cout << "Name: " << getName() << endl
+			<< " | Price: $" << getPrice() << endl
+			<< " | Exp: " << expirationDate << endl;
+	}
+
+	void receiptEntry() const override {
+		cout << getName() << " - $" << getPrice() << endl;
+	}
+};
+class ElectronicItem : public Item {
+private:
+	int warrantyMonths;
+
+public:
+	ElectronicItem(string n, double p, int w) : Item(n, p)
+	{
+		warrantyMonths = w;
+	}
+	void display() const override {
+		cout << "Name: " << getName()
+			<< " | Price: $" << getPrice()
+			<< " | Warranty: " << warrantyMonths << " months" << endl;
+	}
+	void receiptEntry() const override {
+		cout << getName() << " - $" << getPrice() << endl;
+	}
+};
+int main() {
+	Item* store[50];
+	int storeCount = 0;
+	Item* cart[20];
+	int cartCount = 0;
+
+	cout << "****************** Welcome to QuickMart POS ******************";
+	int choice = -1;
+	while (choice != 0) {
+		cout << "\n 1 - Add item to store";
+		cout << "\n 2 - Display available items";
+		cout << "\n 3 - Buy item by name";
+		cout << "\n 4 - View receipt";
+		cout << "\n 0 - Exit" << endl;
+		cin >> choice;
+		if (choice == 1) {
+			string itemType;
+			string name;
+			double price;
+			cout << "Enter item type (Food / Electronic): ";
+			cin >> itemType;
+			cout << "Enter item name: ";
+			cin.ignore();
+			getline(cin, name);
+			cout << "Enter price: ";
+			cin >> price;
+			if (itemType == "Food" || itemType == "food") {
+				string exp;
+				cout << "Enter expieration date: ";
+				cin.ignore();
+				getline(cin, exp);
+				store[storeCount++] = new FoodItem(name, price, exp);
+			}
+			else if (itemType == "Electronic" || itemType == "electronic") {
+				int w;
+				cout << "Enter warranty in months: ";
+				cin >> w;
+				store[storeCount++] = new ElectronicItem(name, price, w);
+
+			}
+			else {
+				cout << "Invalid item type!\n";
+			}
+			cout << "Item Added Successfully!\n";
+		}
+		else if(choice == 2){
+			for (int j = 0; j < storeCount; j++){
+				store[j]->display();
+			}
+		}
+		else if (choice == 3) {
+			string name;
+			cout << "Enter item name: ";
+			cin.ignore();
+			getline(cin, name);
+
+			bool found = false;
+			for (int k = 0; k < storeCount; k++) {
+				if (store[k]->getName() == name) {
+					cart[cartCount++] = store[k];
+					cout << "Purchased " << name
+						<< " for $" << store[k]->getPrice() << endl;
+					found = true;
+					break;
+				}
+			}
+			if (!found) cout << "Item not found.\n";
+		}
+		else if (choice == 4) {
+			double total = 0;
+			cout << "---- Receipt ----\n";
+			for (int i = 0; i < cartCount; i++) {
+				cout << i + 1 << ". ";
+				cart[i] -> receiptEntry();  
+				total += cart[i]->getPrice();
+			}
+			cout << "Total: $" << total << endl;
+		}
+		else if (choice == 0) {
+			cout << "Thank you for shopping at QuickMart!\n";
+		}
+		else {
+			cout << "Invalid choice. Try again.\n";
+		}
+	}
+	
+	return 0;
+	system("pause");
+}
