@@ -1,0 +1,321 @@
+/*
+Erika Ruiz
+11/5/25
+Data Structures
+MidTerm Question 1*/
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+using namespace std;
+// Define maximum size for the stack
+const int MAX = 100;
+// Define a structure to represent a box
+struct box {
+	int id;
+	string itemName;
+	float weigth;
+	string destination;;
+
+};
+class Stack {
+private:
+	box boxes[MAX];
+	int top;
+	// Stack operations
+public:
+	Stack() {
+		top = -1;
+	}
+	bool isFull() {
+		return top == MAX - 1;
+	}
+	bool isEmpty() {
+		return top == -1;
+	}
+	// Add a box to the stack
+	void push(box b) {
+		if (!isFull()) {
+			boxes[++top] = b;
+			cout << "Box added to stack." << endl;
+		}
+		else {
+			cout << "Stack is full! Cannot add more boxes!" << endl;
+		}
+	}
+	// Remove and return the top box from the stack
+	box pop() {
+		if (!isEmpty()) {
+			box b = boxes[top];
+			cout << "Top box dispatched." << endl;
+			cout << "Box ID: " << b.id << ", Item Name: " << b.itemName << ", Weight: " << b.weigth << ", Destination: " << b.destination << endl;
+			return b;
+		}
+		else {
+			cout << "Stack is empty! No boxes to dispatch!" << endl;
+			return box();
+		}
+	}
+	//	View the top box without removing it
+	void peep() {
+		if (!isEmpty()) {
+			cout << "Top Box Details:" << endl;
+			cout << "Box ID: " << boxes[top].id << ", Item Name: " << boxes[top].itemName << ", Weight: " << boxes[top].weigth << ", Destination: " << boxes[top].destination << endl;
+		}
+		else {
+			cout << "Stack is empty! No boxes to view!" << endl;
+		}
+	}
+	//	Display all boxes in the stack
+	void displayStack() {
+		if (isEmpty()) {
+			cout << "Stack is empty! No boxes to display!" << endl;
+		}
+		else {
+			cout << "==============Stacked Boxes===============" << endl;
+			cout << "Box ID, Item Name, Weight, Destination" << endl;
+			cout << "------------------------------------------" << endl;
+			for (int i = top; i >= 0; i--) {
+				cout << "Box ID: " << boxes[i].id << ", Item Name: " << boxes[i].itemName << ", Weight: " << boxes[i].weigth << ", Destination: " << boxes[i].destination << endl;
+			}
+		}
+	}
+	// View inventory summary
+	void viewSummary() {
+		// Calculate total boxes and total weight
+		if (isEmpty()) {
+			cout << "===========Inventory Summary===========" << endl;
+			cout << "Total Boxes in stack: 0" << endl;
+			cout << "Total Weight: 0kg" << endl;
+			cout << "Top Box: None\n";
+			return;
+		}
+		else {
+			int totalBoxes = top + 1;
+			float totalWeight = 0;
+			for (int i = 0; i <= top; i++) {
+				totalWeight += boxes[i].weigth;
+			}
+			cout << "===========Inventory Summary===========" << endl;
+			cout << "Total Boxes in stack: " << totalBoxes << endl;
+			cout << "Total Weight: " << totalWeight << "kg" << endl;
+			cout << "Top Box: ID " << boxes[top].id << "---" << boxes[top].itemName << endl;
+			cout << "========================================" << endl;
+
+
+
+		}
+	}
+	// Save inventory data to a file
+	void saveToFile() {
+		ofstream outFile("inventory.txt");
+		if (!outFile) {
+			cout << "Error opening file for writing!" << endl;
+			return;
+		}
+		for (int i = top; i >= 0; i--) {
+			outFile << boxes[i].id << "," << boxes[i].itemName << "," << boxes[i].weigth << "," << boxes[i].destination << endl;
+		}
+		outFile.close();
+		cout << "Inventory data saved to " << "inventory.txt" << endl;
+	}
+};
+int main() {
+	Stack stack;
+	int choice;
+	do {
+		cout << "\nWarehouse Inventory Management System" << endl;
+		cout << "1. Add Box to Stack" << endl;
+		cout << "2.View Current Stack" << endl;
+		cout << "3. Remove Top Box (Dispatch)" << endl;
+		cout << "4. View Inventory Summary" << endl;
+		cout << "5. Exit" << endl;
+		cout << "Enter your choice: ";
+		cin >> choice;
+		switch (choice) {
+		case 1: {
+			box b;
+			cout << "Enter Box ID: ";
+			cin >> b.id;
+			cout << "Enter Item Name: ";
+			cin >> b.itemName;
+			cout << "Enter Weight (kg): ";
+			cin >> b.weigth;
+			cout << "Enter Destination: ";
+			cin >> b.destination;
+			stack.push(b);
+			break;
+		}
+		case 2:
+			stack.displayStack();
+			break;
+
+		case 3:
+			stack.pop();
+			break;
+		case 4:
+			stack.viewSummary();
+			break;
+		case 5:
+			cout << "Exiting the program." << endl;
+			break;
+		default:
+			cout << "Invalid choice! Please try again." << endl;
+		}
+	} while (choice != 6);
+	system("pause");
+	return 0;
+}
+-------------------------------------------------------------------------------------------------------
+/*
+Erika Ruiz
+MIDTERM PROJECT 2
+11/8/25
+Data Structures
+*/
+#include <iostream>
+#include<fstream>
+#include<string>
+using namespace std;
+const int MAX_ARRAY_SIZE = 100;
+struct TAXI {
+	int id;
+	string dName;
+	string carM;
+	string licenseP;
+
+};
+class TaxiQueue {
+private:
+	TAXI queue[MAX_ARRAY_SIZE];
+	int frontIndex;
+	int backIndex;
+	int count;
+public:
+	TaxiQueue() {
+		frontIndex = 0;
+		backIndex = -1;
+		count = 0;
+
+	}
+	bool isFull() {
+		return count == MAX_ARRAY_SIZE;
+	}
+	bool isEmpty() {
+		return count == 0;
+	}
+	void queues(const TAXI& T) {
+		if (isFull()) {
+			cout << "Queue is full. No more taxis can be added." << endl;
+			return;
+		}
+		backIndex = (backIndex + 1) % MAX_ARRAY_SIZE;
+		queue[backIndex] = T;
+		count++;
+		cout << "Taxi added to queue." << endl;
+
+	}
+	TAXI dequeue() {
+		TAXI temp = {};
+		if (isEmpty()) {
+			cout << "NO Taxis available for Dispatch" << endl;
+			return temp;
+		}
+		temp = queue[frontIndex];
+		frontIndex = (frontIndex + 1) % MAX_ARRAY_SIZE;
+		count--;
+		return temp;
+	}
+	void showQueue() {
+		if (isEmpty()) {
+			cout << "NO Taxis waiting. \n";
+			return;
+		}
+		cout << "=============WAITING TAXIS (FRONT TO BACK)==========\n";
+		cout << "ID\tDriver Namea\t\Car Model\t\tLicense Plate\n";
+		cout << "-------------------------------------------------------------";
+		for (int i = 0; i < count; i++)
+		{
+			int index = (frontIndex + i) % MAX_ARRAY_SIZE;
+			cout << queue[index].id << "\t" << queue[index].dName << "\t\t" << queue[index].carM << "\t\t" << queue[index].licenseP << endl;
+		}
+	}
+	void summary(){
+		if (isEmpty()) {
+			cout << "Queue is empty. No taxis to summarize." << endl;
+			return;
+		}
+		cout << "=============Queue Summary=======\n;";
+		cout << "Total Taxis in Queue: " << count << endl;
+		cout << "Front Taxi ID: " << queue[frontIndex].id << "---" << queue[frontIndex].dName << endl;
+		cout << "Back Taxi ID: " << queue[backIndex].id << "---" << queue[backIndex].dName << endl;
+		cout << "=================================\n";
+		
+	}
+	void saveFile(){
+		ofstream outFile("taxi_queue.txt");
+		if(!outFile) {
+			cout << "Error opening file for writing." << endl;
+			return;
+		}
+		for (int i = 0; i < count; i++)
+		{
+			int index = (frontIndex + 1) % MAX_ARRAY_SIZE;
+			outFile << queue[index].id << "," << queue[index].dName << "," << queue[index].carM << "," << queue[index].licenseP << endl;
+
+		}
+		outFile.close();
+		cout << "Taxi queue saved to taxi_queue.txt. Have a Safe Dispatch." << endl;
+	}
+};
+int main() {
+	TaxiQueue taxiQueue;
+	int choice;
+	do {
+		cout << "\n=====Taxi Queue Management System=====\n";
+		cout << "1. Add Taxi to Queue\n";
+		cout << "2. Dispatch Taxi from Queue\n";
+		cout << "3. Show Waiting Taxis\n";
+		cout << "4. Show Queue Summary\n";
+		cout << "5. Save and Exit\n";
+		cout << "Enter your choice: ";
+		cin >> choice;
+		switch (choice) {
+		case 1: {
+			TAXI newTaxi;
+			cout << "Enter Taxi ID: ";
+			cin >> newTaxi.id;
+			cout << "Enter Driver Name: ";
+			cin >> newTaxi.dName;
+			cout << "Enter Car Model: ";
+			cin >> newTaxi.carM;
+			cout << "Enter License Plate: ";
+			cin >> newTaxi.licenseP;
+			taxiQueue.queues(newTaxi);
+			break;
+		}
+		case 2: {
+			TAXI dispatchedTaxi = taxiQueue.dequeue();
+			if (dispatchedTaxi.id != 0) {
+				cout << "Dispatched Taxi ID: " << dispatchedTaxi.id << ", Driver Name: " << dispatchedTaxi.dName << endl;
+			}
+			break;
+		}
+		case 3:
+			taxiQueue.showQueue();
+			break;
+		case 4:
+			taxiQueue.summary();
+			break;
+		case 5:
+			taxiQueue.saveFile();
+			cout << "Exiting the program." << endl;
+			break;
+		default:
+			cout << "Invalid choice. Please try again." << endl;
+		}
+	} while (choice != 5);
+	system("pause");
+	return 0;
+
+}
