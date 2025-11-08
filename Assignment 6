@@ -1,0 +1,139 @@
+/*
+Erika Ruiz
+Assignment 6
+10/27/2025
+Data Structures
+*/
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+template <typename T1, typename T2>
+struct Package {
+	T1 id;
+	string name;
+	string type;
+	int etaHours;
+	T2 fee;
+	string status; // "Pending" or "Delivered"
+};
+// Function declarations
+template <typename T1, typename T2>
+int loadPackages(Package<T1, T2> packages[]) {
+	ifstream file("packages.txt");
+	int count = 0;
+	if (!file) {
+		return 0;
+	}
+	while (
+		file >> packages[count].id >> packages[count].name >> packages[count].type
+		>> packages[count].etaHours >> packages[count].fee >> packages[count].status)
+	{
+		count++;
+}
+	file.close();
+	cout << count << " packages loaded from packages.txt.\n";
+	return count;
+	}
+template <typename T1, typename T2>
+void savePackages(Package<T1, T2> packages[], int count) {
+	ofstream file("packages.txt");
+	for (int p = 0; p < count; p++)
+	{
+		file << packages[p].id;
+		cout << " ";
+		file << packages[p].name;
+		cout << " ";
+		file << packages[p].type;
+		cout << " ";
+		file << packages[p].etaHours;
+		cout << " ";
+		file << packages[p].fee;
+		cout << " ";
+		file << packages[p].status << endl;
+	}
+	file.close();
+}
+template <typename T1, typename T2>
+void addPackage(Package<T1, T2> packages[], int& count) {
+	cout << "ENter Package ID: ";
+	cin >> packages[count].id;
+	cout << "EnterEnter recipient name: ";
+	cin >> packages[count].name;
+	cout << "Enter delivery type (Standard/Express/Fragile): ";
+	cin >> packages[count].type;
+	cout << "Enter delivery ETA(in hours) :";
+	cin >> packages[count].etaHours;
+	cout << "Enter delivery fee: ";
+	cin >> packages[count].fee;
+	packages[count].status = "Pending";
+	count++;
+	cout << "Package added successfully!\n";
+
+}
+template <typename T1, typename T2>
+void displayPackages(Package<T1, T2> packages[], int count) {
+	cout << "\n * *****PACKAGES * ***\n";
+	cout << "ID \tName\tType\tETA(Hours)\tFee\tStatus\n";
+	for (int i = 0; i < count; i++) {
+		cout << packages[i].id << "\t" << packages[i].name << "\t"
+			<< packages[i].type << "\t" << packages[i].etaHours << "\t\t"
+			<< fixed << setprecision(2) << packages[i].fee << "\t"
+			<< packages[i].status << endl;
+	}
+}
+template <typename T1, typename T2>
+void markDelivered(Package<T1, T2> packages[], int count) {
+	T1 id;
+	cout << "Enter package ID to mark as delivered: ";
+	cin >> id;
+	for (int i = 0; i < count; i++) {
+		if (packages[i].id == id) {
+			packages[i].status = "Delivered";
+			cout << "Package ID " << id << " marked as delivered.\n";
+			return;
+		}
+	}
+	cout << "Package ID could not be found.";
+}
+template <typename T1, typename T2>
+void deliveryReport(Package<T1, T2> packages[], int count) {
+	int deliveredCount = 0;
+	double totalRevenue = 0.0;
+	for (int i = 0; i < count; i++)
+	{
+		if (packages[i].status == "Delivered") {
+			deliveredCount++;
+			totalRevenue += packages[i].fee;
+		}
+		
+	}
+	cout << "\n***** Delivery Report *****\n";
+	cout << "Total Packages: " << count << endl;
+	cout << "Delivered Packages: " << deliveredCount << endl;
+	cout << "Pending Packages: " << count - deliveredCount << endl;
+	cout << "Total Revenue from Delivered Packages: $" << totalRevenue << endl;
+}
+int main() {
+	Package<int, double> packages[100];
+	int count = loadPackages(packages);
+	int choice;
+	do {
+		cout << "\n******** Welcome to Package Delivery Tracker ********\n";
+		cout << "1. Add New Package\n2. Display All Packages\n3. Mark Package as Delivered\n4.View Delivery Report\n5.Exit\n→ ";
+		cin >> choice;
+		switch (choice) {
+		case 1: addPackage(packages, count); break;
+		case 2: displayPackages(packages, count); break;
+		case 3: markDelivered(packages, count); break;
+		case 4: deliveryReport(packages, count); break;
+		case 5: savePackages(packages, count);
+			cout << "Data saved to packages.txt. Goodbye!" << endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 5);
+	system("pause");
+	return 0;
+
+}
