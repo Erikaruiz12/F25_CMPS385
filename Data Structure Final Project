@@ -1,0 +1,254 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <vector>
+#include <random>
+#include <map>
+#include <stack>
+#include <algorithm>
+#include <cctype>
+using namespace std;
+
+class Hotel {
+public:
+    string name;
+    string description;
+    double rate;
+
+    Hotel(string name, string description, double rate)
+        : name(name), description(description), rate(rate) {
+    }
+
+    void displayInfo(int index) const {
+        cout << index + 1 << " " << name << ": " << description << endl;
+    }
+
+    void displayRate(int index) const {
+        cout << "\n\t\t\t  " << index + 1 << " " << name << "\t\t$" << fixed << setprecision(2) << rate << "\t\t" << endl;
+        cout << "\t\t\t" << setfill('_') << setw(50) << "" << endl;
+    }
+};
+
+class City {
+public:
+    string name;
+    map<string, Hotel> hotels;
+
+    City(string name, map<string, Hotel> hotels)
+        : name(name), hotels(hotels) {
+    }
+
+    void displayHotels() const {
+        cout << "\n\t" << name << " is a wonderful destination to stay at! Here is a list of hotels we are partnered with." << endl;
+        cout << setfill('~') << setw(120) << "\n\n";
+
+        int index = 0;
+        for (const auto& pair : hotels) {
+            pair.second.displayInfo(index++);
+        }
+    }
+
+    void displayRates() const {
+        cout << "\n\n\t\t\t\t\tDaily Rates" << endl;
+        cout << setfill('~') << setw(120) << "\n\n";
+
+        int index = 0;
+        for (const auto& pair : hotels) {
+            pair.second.displayRate(index++);
+        }
+    }
+};
+
+
+static string trim(const string& str) {
+    size_t first = str.find_first_not_of(" \t\n\r\f\v");
+    size_t last = str.find_last_not_of(" \t\n\r\f\v");
+    return (first == string::npos || last == string::npos) ? "" : str.substr(first, last - first + 1);
+}
+
+static string generateConfirmation() {
+    string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    string result = "#";
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dis(0, chars.size() - 1);
+    for (int i = 0; i < 5; ++i)
+        result += chars[dis(gen)];
+    return result;
+}
+
+static bool equalsIgnoreCase(const string& a, const string& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (tolower(a[i]) != tolower(b[i])) return false;
+    }
+    return true;
+}
+
+int main() {
+    map<string, City> citiesMap = {
+        {"New York City", City("New York City", {
+            {"The Empire Retreat", Hotel("The Empire Retreat", "A luxury hotel located in the heart of Times Square.", 82.99)},
+            {"The Greenwich Manor", Hotel("The Greenwich Manor", "Charming boutique hotel in Greenwich Village.", 115.99)},
+            {"The Green Hotel", Hotel("The Green Hotel", "Eco-friendly with a rooftop garden.", 177.99)},
+            {"The Astoria Grand", Hotel("The Astoria Grand", "Historic luxury hotel in the Upper East Side.", 215.99)}
+        })},
+        {"Los Angeles", City("Los Angeles", {
+            {"Oceanview Suites", Hotel("Oceanview Suites", "Beachfront hotel in Santa Monica.", 92.99)},
+            {"The Beverly Crest", Hotel("The Beverly Crest", "Luxurious hotel in Beverly Hills.", 125.99)},
+            {"The Skyline Hotel", Hotel("The Skyline Hotel", "Downtown hotel with infinity pool.", 187.99)},
+            {"Sunset Palms Resort", Hotel("Sunset Palms Resort", "Hollywood hotel with celebrity history.", 215.99)}
+        })},
+        {"Chicago", City("Chicago", {
+            {"The Riverstone Front", Hotel("The Riverstone Front", "Riverfront hotel near Navy Pier.", 72.99)},
+            {"The Millennium Estates", Hotel("The Millennium Estates", "Modern hotel in the Loop.", 105.99)},
+            {"The Millennium Haven", Hotel("The Millennium Haven", "Family-friendly hotel near Millennium Park.", 167.99)},
+            {"The Magnificent Court", Hotel("The Magnificent Court", "Luxury hotel in the Magnificent Mile.", 205.99)}
+        })},
+        {"Miami", City("Miami", {
+            {"Ocean Breeze Resort", Hotel("Ocean Breeze Resort", "Art deco hotel in South Beach.", 99.99)},
+            {"Coconut Palace", Hotel("Coconut Palace", "Boutique hotel in Coconut Grove.", 129.99)},
+            {"Bayside Retreat", Hotel("Bayside Retreat", "Luxury resort on Miami Beach.", 199.99)},
+            {"Brickell Bay Hotel", Hotel("Brickell Bay Hotel", "Sleek hotel with bay views.", 234.99)}
+        })},
+        {"San Francisco", City("San Francisco", {
+            {"Golden Gate Hotel", Hotel("Golden Gate Hotel", "Boutique hotel in Nob Hill.", 109.99)},
+            {"Union Square Inn", Hotel("Union Square Inn", "Modern hotel near Union Square.", 154.99)},
+            {"Fisherman's Cove", Hotel("Fisherman's Cove", "Classic hotel near Fisherman's Wharf.", 199.99)},
+            {"Bayview Towers", Hotel("Bayview Towers", "Luxury waterfront hotel.", 249.99)}
+        })}
+    };
+
+    cout << fixed << setprecision(2);
+    cout << setfill('~') << setw(85) << "Welcome to Leo's Stays, the Premium Travel Partner of the World";
+    cout << setfill('~') << setw(25) << '\n' << endl;
+
+    cout << "\n\tLeo's Stays is proud to have partnered with over 20 hotels, in 5 cities across the USA\n" << endl;
+
+    for (const auto& pair : citiesMap) {
+        cout << "\t\t\t\t\t\t" << pair.first << endl;
+        cout << "\t\t\t\t    " << setfill('_') << setw(30) << ' ' << endl;
+    }
+
+    string inputCity;
+    City* selectedCityPtr = nullptr;
+    Hotel* selectedHotelPtr = nullptr;
+
+    // FIX: Declare the stack here before it is used later
+    stack<string> bookingHistoryStack;
+
+    while (!selectedCityPtr) {
+        cout << "\n\n\n\tWhat city do you plan on staying in for your vacation?\n" << endl;
+        getline(cin, inputCity);
+
+        inputCity = trim(inputCity);
+
+        for (auto& pair : citiesMap) {
+            if (equalsIgnoreCase(pair.first, inputCity)) {
+                selectedCityPtr = &pair.second;
+                break;
+            }
+        }
+
+        if (!selectedCityPtr) cout << "\nThat is an invalid city. Please try again." << endl;
+    }
+
+    selectedCityPtr->displayHotels();
+    selectedCityPtr->displayRates();
+
+    string hotelNameInput;
+    int hotelIndex = -1;
+
+    while (!selectedHotelPtr) {
+        cout << "\n\nPlease enter the **full name** of the hotel you wish to select: ";
+        getline(cin, hotelNameInput);
+        hotelNameInput = trim(hotelNameInput);
+
+        auto it = selectedCityPtr->hotels.find(hotelNameInput);
+
+        if (it != selectedCityPtr->hotels.end()) {
+            selectedHotelPtr = &it->second;
+
+            int idx = 0;
+            for (const auto& pair : selectedCityPtr->hotels) {
+                if (pair.first == hotelNameInput) {
+                    hotelIndex = idx;
+                    break;
+                }
+                idx++;
+            }
+        }
+        if (!selectedHotelPtr) cout << "\nInvalid hotel name. Please enter the full name as displayed." << endl;
+    }
+
+    cout << "You selected " << selectedHotelPtr->name << "." << endl;
+
+    // First pushes to the stack after selection is complete
+    bookingHistoryStack.push("Selected City: " + selectedCityPtr->name);
+    bookingHistoryStack.push("Selected Hotel: " + selectedHotelPtr->name);
+
+    int days = 0;
+    while (days <= 0) {
+        cout << "How many days will you be staying? ";
+        if (!(cin >> days) || days <= 0) {
+            cout << "Please enter a valid positive number of days.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            days = 0;
+        }
+    }
+    cin.ignore(10000, '\n');
+
+    bookingHistoryStack.push("Stay Duration: " + to_string(days) + " days");
+
+    double total = selectedHotelPtr->rate * days;
+    cout << "\n" << days << " day(s) at " << selectedHotelPtr->name << " will be a total of $" << total << endl;
+
+    string cardholder, cardNumber, expDate, cvv;
+    cout << "\nPlease proceed with payment to confirm your booking." << endl;
+
+    cout << "Enter cardholder name: ";
+    getline(cin, cardholder);
+
+    while (true) {
+        cout << "Enter 16-digit card number (no spaces): ";
+        getline(cin, cardNumber);
+        if (cardNumber.length() == 16 && all_of(cardNumber.begin(), cardNumber.end(), ::isdigit)) break;
+        cout << "Invalid card number. Please try again." << endl;
+    }
+
+    while (true) {
+        cout << "Enter expiration date (MM/YY): ";
+        getline(cin, expDate);
+        if (expDate.length() == 5 && expDate[2] == '/' &&
+            isdigit(expDate[0]) && isdigit(expDate[1]) &&
+            isdigit(expDate[3]) && isdigit(expDate[4])) break;
+        cout << "Invalid format. Use MM/YY." << endl;
+    }
+
+    while (true) {
+        cout << "Enter 3-digit CVV: ";
+        getline(cin, cvv);
+        if (cvv.length() == 3 && all_of(cvv.begin(), cvv.end(), ::isdigit)) break;
+        cout << "Invalid CVV. Please try again." << endl;
+    }
+
+    string confirmation = generateConfirmation();
+    bookingHistoryStack.push("Confirmation Number: " + confirmation);
+
+    cout << "\nPayment successful. Thank you, " << cardholder << "!" << endl;
+
+    cout << setfill('~') << setw(120) << "\n\n";
+    cout << "\nYour confirmation number is " << confirmation << ". We hope you enjoy your stay in "
+        << selectedCityPtr->name << " at " << selectedHotelPtr->name << "." << endl;
+    cout << "\nWe appreciate you booking with Leo's Stays! Goodbye!\n\n" << setfill('~') << setw(120) << "\n\n";
+
+    cout << "\n*** Internal System Traceback (Stack LIFO) ***" << endl;
+    while (!bookingHistoryStack.empty()) {
+        cout << bookingHistoryStack.top() << endl;
+        bookingHistoryStack.pop();
+    }
+    cout << "*******************************************" << endl;
+
+    return 0;
+}
