@@ -1,0 +1,498 @@
+Problem 1: 
+/*
+Name: Erika Ruiz
+Assignment 8
+Date: 12/13/25
+Data Structure: CMPS 385
+*/
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include<string>
+using namespace std;
+struct Patient {
+	string id;
+	string name;
+	string condition;
+	int severity;
+	Patient* next;
+};
+Patient* head = nullptr;
+int totalServed = 0;
+// Function declarations
+void loadPatients();
+void savePatients();
+void addPatient();
+void displayQueue();
+void servePatient();
+void showSummary();
+int main() {
+	loadPatients();
+	int choice;
+	do {
+		cout << "\n****** Welcome to ER Patient Queue Manager ******\n";
+		cout << "1. Add New Patient\n2. Display Patient Queue\n3. Serve Next Patient\n4.View ER Summary\n5.Exit\n→ ";
+			cin >> choice;
+		switch (choice) {
+		case 1: addPatient(); break;
+			
+		case 2: displayQueue(); break;
+		case 3: servePatient(); break;
+		case 4: showSummary(); break;
+		case 5: savePatients();
+			cout << "Patient queue saved to patients.txt. Stay safe!" << endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 5);
+	system("pause");
+return 0;
+}
+// Function definitions
+// Load patients from file
+void loadPatients()
+{
+	ifstream infile("patients.txt");
+	if (!infile) return;
+	while (!infile.eof()) {
+		Patient* newPatient = new Patient;
+		getline(infile, newPatient->id);
+		if (newPatient->id.empty()) {
+			delete newPatient;
+			break;
+		}
+		getline(infile, newPatient->name);
+		getline(infile, newPatient->condition);
+		infile >> newPatient->severity;
+		infile.ignore();
+		newPatient->next = nullptr;
+		if(!head) {
+			head = newPatient;
+		}
+		else {
+			Patient* temp = head;
+			while (temp->next) temp = temp->next;
+			temp->next = newPatient;
+		}
+		infile.close();
+
+	}
+}
+// Save patients to file
+void savePatients()
+{
+	ofstream outfile("patients.txt");
+	Patient* temp = head;
+	while (temp) {
+		outfile << temp->id << endl;
+		outfile << temp->name << endl;
+		outfile << temp->condition << endl;
+		outfile << temp->severity << endl;
+		temp = temp->next;
+	}
+	outfile.close();
+}
+//	Add new patient to the queue
+void addPatient()
+{// Create new patient
+	Patient* newPatient = new Patient;
+	cout << "Please enter patient ID: ";
+	cin >> newPatient->id;
+	cin.ignore();
+	cout << "Please enter patient name: ";
+	getline(cin, newPatient->name);
+	cout << "Please enter patient condition: ";
+	getline(cin, newPatient->condition);
+	cout << "Please enter severity level (1-5): ";
+	cin >> newPatient->severity;
+	newPatient->next = nullptr;
+	if (!head || newPatient->severity > head->severity) {
+		newPatient->next = head;
+		head = newPatient;
+	}
+	// Insert patient in the correct position based on severity
+	else {
+		Patient* temp = head;
+		while (temp->next && temp->next->severity >= newPatient->severity) {
+			temp = temp->next;
+		}
+		newPatient->next = temp->next;
+		temp->next = newPatient;
+	}
+	cout << "Patient added to the queue.\n";
+}
+// Display the current patient queue
+void displayQueue()
+{
+	if(head == nullptr) {
+		cout << "No patients in the queue.\n";
+		return;
+	}
+	cout << "\n=========================Current QUeyte=======================\n";
+	cout << "ID \tName\tCondition\tSeverity\n";
+	cout << "--------------------------------------------------------------\n";
+	Patient* temp = head;
+	while (temp) {
+		cout << temp->id << "\t" << temp->name << "\t" << temp->condition << "\t" << temp->severity << endl;
+		temp = temp->next;
+	}
+
+}
+// Serve the next patient in the queue
+void servePatient()
+{
+	if (!head) {
+		cout << "No patients to serve.\n";
+		return;
+	}
+	Patient* temp = head;
+	head = head->next;
+	cout << "Serving Patient:\n";
+	cout << "ID: " << temp->id << "\nName: " << temp->name << "\nCondition: " << temp->condition << "\nSeverity: " << temp->severity << endl;
+	delete temp;
+	totalServed++;
+}
+// Show ER summary
+void showSummary()
+{
+	int count = 0;
+	int severitySum = 0;
+
+	Patient* temp = head;
+	while (temp) {
+		count++;
+		severitySum += temp->severity;
+		temp = temp->next;
+	}
+	cout << "\n====== ER Summary ======\n";
+	cout << "Total Patients Served: " << totalServed << endl;
+	cout << "Patients Quedes: " << count << endl;
+	if(count > 0) {
+		cout << "Average Severity of Queued Patients: " << fixed << setprecision(2) << (double)severitySum / count << endl;
+	} else {
+		cout << "Average Severity of Queued Patients: 0\n";
+	}
+	cout << "=========================\n";
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Problem 2:
+/*
+Name: Erika RUiz
+Date: December 13, 2025
+Assigbnment: 8.2
+CMPS 385: Data Structures
+*/
+
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+using namespace std;
+// Song structure
+struct Song {
+	int id;
+	string title;
+	string artist;
+	float duration;
+	Song* prev;
+	Song* next;
+};
+// Global pointers
+Song* head = nullptr;
+Song* tail = nullptr;
+Song* current = nullptr;
+// Function declarations
+void loadPlaylist();
+void savePlaylist();
+void addSong();
+void displayPlaylist();
+void playNext();
+void playPrevious();
+void removeSong();
+//	Main function
+int main() {
+		loadPlaylist();
+	int choice;
+	do {
+		cout << "\n****** Welcome to Music Playlist Manager ******\n";
+		cout << "1. Add Song to Playlist\n2. Display Playlist\n3. Play Next Song\n4.Play Previous Song\n5.Remove Song\n6.Save and Exit\n→ ";
+			cin >> choice;
+		switch (choice) {
+		case 1: addSong(); break;
+		case 2: displayPlaylist(); break;
+		case 3: playNext(); break;
+		case 4: playPrevious(); break;
+		case 5: removeSong(); break;
+		case 6: savePlaylist();
+			cout << "Playlist saved. See you next jam!" << endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 6);
+	return 0;
+}
+// Function definitions
+void loadPlaylist()
+{
+	// Load playlist from file
+	ifstream inFile("playlist.txt");
+	if (!inFile) {
+		cout << "No existing playlist found. Starting a new one.\n";
+		return;
+	}
+	// Read songs from file
+	Song* tail = nullptr;
+	while (!inFile.eof()) {
+		Song* newSong = new Song;
+		inFile >> newSong->id;
+		inFile.ignore();
+		getline(inFile, newSong->title);
+		getline(inFile, newSong->artist);
+		inFile >> newSong->duration;
+		inFile.ignore();
+		newSong->prev = tail;
+		newSong->next = nullptr;
+		if (tail) tail->next = newSong;
+		else head = newSong;
+		tail = newSong;
+	}
+	tail = tail;
+	current = head;
+	inFile.close();
+}
+// Save playlist to file
+void savePlaylist()
+{
+	// Save playlist to file
+	ofstream outFile("playlist.txt");
+	Song* temp = head;
+	while (temp) {
+		outFile << temp->id << endl;
+		outFile << temp->title << endl;
+		outFile << temp->artist << endl;
+		outFile << temp->duration << endl;
+		temp = temp->next;
+	}
+	outFile.close();
+}
+
+void addSong()
+{
+	// Add a new song to the playlist
+	Song* newSong = new Song;
+	cout << "Enter Song ID: ";
+	cin >> newSong->id;
+	cin.ignore();
+	cout << "Enter Song Title: ";
+	getline(cin, newSong->title);
+	cout << "Enter Artist Name: ";
+	getline(cin, newSong->artist);
+	cout << "Enter Duration (in minutes): ";
+	cin >> newSong->duration;
+	newSong->next = nullptr;
+	newSong->prev = tail;
+	if (head == nullptr) {
+		head = tail = current = newSong;
+	}
+	else {
+		tail->next = newSong;
+		tail = newSong;
+	}
+	cout << "Song added to playlist.\n";
+}
+//	Display the playlist
+void displayPlaylist()
+{
+	if (head == nullptr) {
+		cout << "Playlist is empty.\n";
+		return;
+	}
+	Song* temp = head;
+	cout << "\nID\tTitle\tArtist\tDuration\n";
+	cout << "----------------------------------------\n";
+	while (temp != nullptr) {
+		cout << temp->id << "\t" << temp->title << "\t" << temp->artist << "\t" << fixed << setprecision(2) << temp->duration << " mins\n";
+		temp = temp->next;
+	}
+}
+//	Play the next song
+void playNext()
+{
+ if (current == nullptr) {
+		cout << "Playlist is empty.\n";
+		return;
+	}
+	if (current->next != nullptr) {
+		current = current->next;
+		cout << "Now playing: " << current->title << " by " << current->artist << "\n";
+	}
+	else {
+		cout << "You are at the end of the playlist.\n";
+	}
+}
+//	Play the previous song
+void playPrevious()
+{
+	if (current == nullptr) {
+		cout << "Playlist is empty.\n";
+		return;
+	}
+	if (current->prev != nullptr) {
+		current = current->prev;
+		cout << "Now playing: " << current->title << " by " << current->artist << "\n";
+	}
+	else {
+		cout << "You are at the beginning of the playlist.\n";
+	}
+}
+//	Remove the current song
+void removeSong()
+{
+	// Remove the current song from the playlist
+	if (current == nullptr) {
+		cout << "No song to remove.\n";
+		return;
+	}
+	Song* temp = current;
+	if(temp->prev) 
+		temp->prev->next = temp->next;
+	else 
+		head = temp->next;
+	if (temp->next != nullptr) {
+		temp->next->prev = temp->prev;
+	}
+	else {
+		tail = temp->prev;
+	}
+	current = (temp->next) ? temp->next : temp->prev;
+	delete temp;
+	cout << "Song removed." << endl;
+}
+----------------------------------------------
+Problem 3: 
+/*
+Name:Erika Ruiz
+Date: December 13, 2025
+Assignment 8.3: Smart Traffic Light Controller
+CMPS 385: Data Structures
+*/
+#include <iostream>
+#include <string>
+using namespace std;
+struct TrafficLight {
+	int id;
+	string roadName;
+	string color;
+	TrafficLight* next;
+};
+TrafficLight* head = nullptr;
+TrafficLight* current = nullptr;
+// Function declarations
+void addLight();
+void displaySequence();
+void advanceLight();
+void resetSystem();
+int main() {
+	int choice;
+	do {
+		cout << "\n****** Welcome to Smart Traffic Light Controller ******\n";
+		cout << "1. Add Road and Light\n2. Display Light Sequence\n3. Advance to Next Light\n4.Reset System\n5.Exit\n→ ";
+		cin >> choice;
+		switch (choice) {
+		case 1: addLight(); break;
+		case 2: displaySequence(); break;
+		case 3: advanceLight(); break;
+		case 4: resetSystem(); break;
+		case 5: cout << "Traffic system saved. Goodbye and drive safe!" << endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 5);
+	system("pause");
+	return 0;
+}
+// Function definitions
+	// Add a new traffic light	
+void addLight()
+	{
+	// Create a new traffic light node
+	TrafficLight* newLight = new TrafficLight();
+		cout << "Enter Road ID: ";
+		cin >> newLight->id;
+		cin.ignore();
+		cout << "Enter Road Name: ";
+		getline(cin, newLight->roadName);
+		cout << "Enter Starting Light Color (Red/Green/Yellow): ";
+		cin >> newLight->color;
+		cin.ignore();
+		// Insert the new light into the circular linked list
+		if (head == nullptr) {
+			newLight->next = newLight;
+			head = current = newLight;
+		}
+		else {
+			TrafficLight* temp = head;
+			while (temp->next != head) {
+				temp = temp->next;
+			}
+			temp->next = newLight;
+			newLight->next = head;
+
+		}
+		cout << "Traffic light for " << newLight->roadName;
+	}
+// Display the current sequence of traffic lights
+	void displaySequence()
+	{
+		if (head == nullptr) {
+			cout << "No traffic lights in the system.\n";
+			return;
+		}
+		cout << "\n====================Trafic Light Sequecne ====================\n";
+		cout << "ID\tRoad Name\tLight\n";
+		cout << "----------------------------------------\n";
+		TrafficLight* temp = head;
+		do {
+			cout << temp->id << "\t" << temp->roadName << "\t\t" << temp->color << "\n";
+			temp = temp->next;
+		} while (temp != head);
+	}
+	// Advance to the next traffic light
+	void advanceLight()
+	{
+		if(head == nullptr) {
+			cout << "No traffic lights in the system.\n";
+			return;
+		}
+		TrafficLight* temp = head;
+		do {
+			temp->color = "Yellow";
+			temp = temp->next;
+		} while (temp != head);
+		current->color = "Red";
+		current->next->color = "Green";
+		current = current->next;
+		cout << "Traffic Ligjts updated.\n";
+
+	}
+	//	Reset the traffic light system
+	void resetSystem()
+	{
+		if (head == nullptr) {
+			cout << "System is emopty.\n";
+			return;
+
+		}
+		TrafficLight* temp = head ->next;
+		head->next = nullptr;
+		while (temp !=nullptr) {
+		TrafficLight* nextNode = temp->next;
+		delete nextNode;
+		temp = nextNode;
+		}
+		delete head;
+		head = current = nullptr;
+		cout << "System reset.\n";
+
+	}
