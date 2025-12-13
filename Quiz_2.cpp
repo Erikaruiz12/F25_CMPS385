@@ -1,0 +1,110 @@
+/*Erika Ruiz
+Date: 9/89/25
+Assignment: Quiz 2
+Database Structures
+*/
+#include <iostream>
+#include<string>
+using namespace std;
+
+class Task { //sets the class 
+private: //Private 
+	int id;
+	string description;
+	bool done;
+public: //Public
+	Task() { //sets the variable definitions
+		id = 0;
+		description = " ";
+		done = false;
+	}
+	//getters
+	int getID() {
+		return id;
+	}
+	string getDesc() {
+		return description;
+	}
+	bool allDone() {
+		return done;
+	}
+	//setters
+	void setDesc(string newDesc) {
+		description = newDesc;
+	}
+	void toggle() {
+		done = !done;
+	}
+	void display() {
+		cout << "ID: " << id << "|" << "Description" << description << "|" << (done ? "Done" : "Pending") << endl;
+	}
+	Task(int newID, const string& newDesc) {
+		id = newID;
+		description = newDesc;
+		done = false;
+	}
+};
+int main() {
+	const int MAX = 50; //sets the max to 50 tasks
+	Task tasks[MAX];
+	int newID = 1001; //sets the ID to start at 1001
+	int count = 0; //sets count to 0
+	int choice = -1;
+	while (choice != 0)
+	{
+		cout << "****************Welcome to To-Do Manager*****************" << endl;
+		cout << "1: Add Task" << endl;
+		cout << " 2: Toggle Task (By ID) " << endl;
+		cout << "3: List Pending Tasks " << endl;
+		cout << "0: Exit" << endl;
+		cin >> choice;
+		cin.ignore();
+		if (choice == 1) {
+			if (count < MAX) { //Ensures tasks are less than 50
+				string desc;
+				cout << "Please enter the task description : ";
+				getline(cin, desc);
+				tasks[count] = Task(newID, desc);
+				cout << "Task Added! ID: " << newID << endl;
+				count++;
+				newID++; //continues the ID count
+			}
+		}
+		else if (choice == 2) {
+			int id;
+			cout << " Task ID: " << endl;
+			cin >> id;
+			bool found = false;
+			for (int j = 0; j < count; j++)  //sets the task as toggles
+			{
+				if (tasks[j].getID() == id)
+				{
+					tasks[j].toggle();
+					cout << "Toggled Task" << " " << id << endl;
+					found = true;
+				}
+			}
+
+		}
+		else if (choice == 3) {  //demonstrates all toggled tasks
+			cout << "---Pending Tasks--- " << endl;
+			bool all = false;
+			for (int l = 0; l < count; l++)
+			{
+				if (!tasks[l].allDone()) {
+					tasks[l].display(); //displays 
+					all = true;
+				}
+			}
+			if (!all) {
+				cout << "No Pending Tasks" << endl; //sets no tasks found if all toggled
+
+			}
+		}
+		if (choice == 0) {
+			cout << "Goodbye" << endl;
+		}
+	}
+	system("pause");
+	return 0;
+}
