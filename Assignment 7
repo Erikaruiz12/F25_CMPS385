@@ -1,0 +1,283 @@
+Problem 1: 
+/*
+Name: Erika Ruiz
+Date: December 18,2025
+Class: CMPS 385 Data Structures
+Assignement: #7-1 */
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+struct Order {
+	string id;
+	string name;
+	string item;
+	int quantity;
+	float price;
+	string status; // "Pending" or "Served"
+};
+// Function declarations
+void loadOrders(vector<Order>& orders);
+void saveOrders(const vector<Order>& orders);
+void placeOrder(vector<Order>& orders);
+void displayOrders(const vector<Order>& orders);
+void markServed(vector<Order>& orders);
+void salesSummary(const vector<Order>& orders);
+int main() {
+	vector<Order> orders;
+	loadOrders(orders);
+	int choice;
+	do {
+		cout << "\n****** Welcome to Restaurant Order Manager ******\n";
+		cout << "1. Place New Order\n2. Display All Orders\n3. Mark Order as Served\n4.View Sales Summary\n5.Exit\n→ ";
+			cin >> choice;
+		switch (choice) {
+		case 1: placeOrder(orders); break;
+		case 2: displayOrders(orders); break;
+		case 3: markServed(orders); break;
+		case 4: salesSummary(orders); break;
+		case 5: saveOrders(orders);
+			cout << "Orders saved to orders.txt. Have a great day!" << endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 5);
+	return 0;
+}
+//Function definitions
+void loadOrders(vector<Order>& orders) {
+	ifstream file("orders.txt");
+	if (!file) {
+		return;
+	}
+	Order order;
+	while(file>> order.id >> order.name >> order.item >> order.quantity >> order.price >> order.status) {
+		orders.push_back(order);
+	}	
+	file.close();
+}
+
+void saveOrders(const vector<Order>& orders)
+{
+	ofstream file("order.txt");
+
+	for(int i = 0; i < orders.size(); i++) {
+		file << orders[i].id << " " << orders[i].name << " " << orders[i].item << " "
+			 << orders[i].quantity << " " << orders[i].price << " " << orders[i].status << endl;
+	}
+	file.close();
+}
+
+void placeOrder(vector<Order>& orders)
+{
+	Order order;
+	cout << "Please enter Order ID: ";
+	cin >> order.id;
+	cout << "Please enter Customer Name: ";
+	cin >> order.name;
+	cout << "Please enter Menu Name: ";
+	cin >> order.item;
+	cout << "Please enter Quantity: ";	
+	cin >> order.quantity;
+	cout << "Please enter Price: ";
+	cin >> order.price;
+	order.status = "Pending";
+	orders.push_back(order);
+	cout << "Order placed successfully!\n";
+}
+
+void displayOrders(const vector<Order>& orders)
+{
+	cout << "===================Current Orders===============\n";
+	for (int i = 0; i < orders.size(); i++)
+	{
+	float total = orders[i].quantity * orders[i].price;
+	cout<<"ID: "<< orders[i].id << ", Name: " << orders[i].name << ", Item: " << orders[i].item
+		<< ", Quantity: " << orders[i].quantity << ", Price: " << fixed << setprecision(2) << orders[i].price
+		<< ", Total: " << fixed << setprecision(2) << total << ", Status: " << orders[i].status << endl;
+	}
+}
+
+void markServed(vector<Order>& orders)
+{
+ string id;
+	cout << "Please enter Order ID to be marked as served: ";
+	cin >> id;
+	for (int i = 0; i < orders.size(); i++)
+	{
+		if (orders[i].id == id)
+		{
+			orders[i].status = "Served";
+			cout << "Order " << id << " was marked as served.\n";
+			return;
+		}
+	}
+	cout << "Order ID was not found.\n";
+}
+
+void salesSummary(const vector<Order>& orders)
+{
+	int totalOrders = orders.size();
+	int servedOrders = 0;
+	float totalSales = 0;
+	for (int i = 0; i < orders.size(); i++)
+	{
+		if (orders[i].status == "Served")
+		{
+			servedOrders++;
+			totalSales += orders[i].quantity * orders[i].price;
+		}
+	}
+	cout << "====== Sales Summary ======\n";
+	cout << "Total Orders: " << totalOrders << endl;
+	cout << "Served Orders: " << servedOrders << endl;
+	cout << "Pending Orders: " << totalOrders - servedOrders << endl;
+	cout << "Total Sales: $" << fixed << setprecision(2) << totalSales << endl;
+	cout << "===========================\n";
+}
+----------------------------------------------------------------------------------
+AProblem 2:
+/*
+Name: Erika Ruiz
+Date: December 18/2025
+CMPS: 385 Data Structures
+Assignment 7.2
+*/
+#include <iostream>
+#include <fstream>
+#include <list>
+#include <iomanip>
+using namespace std;
+struct Patient {
+	string id;
+	string name;
+	string severity;
+	int waitTime;
+	string status; // "Waiting" or "Admitted"
+};
+// Function declarations
+void loadPatients(list<Patient>& patients);
+void savePatients(const list<Patient>& patients);
+void registerPatient(list<Patient>& patients);
+void displayQueue(const list<Patient>& patients);
+void admitPatient(list<Patient>& patients);
+void viewSummary(const list<Patient>& patients);
+// Main function
+int main() {
+	list<Patient> patients;
+	loadPatients(patients);
+	int choice;
+	do {
+		cout << "\n****** Welcome to Emergency Room Queue Manager* *****\n";
+			cout << "1. Register New Patient\n2. Display Patient Queue\n3. Admit Patient\n4.View ER Summary\n5.Exit\n→ ";
+			cin >> choice;
+		switch (choice) {
+		case 1: registerPatient(patients); break;
+		case 2: displayQueue(patients); break;
+		case 3: admitPatient(patients); break;
+		case 4: viewSummary(patients); break;
+		case 5: savePatients(patients);
+			cout << "Patient queue saved to patients.txt. Have a safe shift!" <<
+				endl;
+			break;
+		default: cout << "Invalid option. Try again.\n";
+		}
+	} while (choice != 5);
+	return 0;
+}
+// Function definitions
+// Load patients from file
+void loadPatients(list<Patient>& patients)
+{
+	// Open the file
+	ifstream inFile("patients.txt");
+	if (!inFile) {
+		cout << "No existing patient data found. Starting fresh.\n";
+		return;
+	}
+	// Read patient data
+	Patient p;
+	while (inFile >> p.id >> p.name >> p.severity >> p.waitTime >> p.status) {
+		patients.push_back(p);
+	}
+	inFile.close();
+}
+// Save patients to file
+void savePatients(const list<Patient>& patients)
+{
+	ofstream outFile("patient.txt");
+	for (Patient p : patients)
+	{
+		outFile << p.id << " " << p.name << " " << p.severity << " " << p.waitTime << " " << p.status << endl;
+	}
+	outFile.close();
+
+}
+// Register a new patient
+void registerPatient(list<Patient>& patients)
+{
+ Patient p;
+	cout << "Enter Patient ID: ";
+	cin >> p.id;
+	cout << "Enter Patient Name: ";
+	cin >> p.name;
+	cout << "Enter Severity Level (Low/Medium/High/Critical): ";
+	cin >> p.severity;
+	cout << "Enter Estimated Wait Time (in minutes): ";
+	cin >> p.waitTime;
+	p.status = "Waiting";
+	patients.push_back(p);
+	cout << "Patient registered successfully.\n";
+}
+// Display the patient queue
+void displayQueue(const list<Patient>& patients)
+{
+	cout << "================= Patient Queue ================\n";
+	for (Patient p : patients) {
+		cout << "ID: " << p.id << ", Name: " << p.name << ", Severity: " << p.severity << ", Wait Time: " << p.waitTime << " minutes, Status: " << p.status << endl;
+		cout << "-----------------------------------------------\n";
+	}
+
+}
+//	Admit the next patient
+void admitPatient(list<Patient>& patients)
+{
+	if (patients.empty()) {
+		cout << "No patients in the queue.\n";
+		return;
+	}
+	patients.front().status = "Admitted";
+	cout << "Patient " << patients.front().name << " has been admitted.\n";
+}
+// View emergency room summary
+void viewSummary(const list<Patient>& patients)
+{
+	int totalptents = patients.size();	
+	int waitingCount = 0;
+	int waitTimeSum = 0;
+	int admit = 0;
+
+	for(Patient p : patients) {
+		if (p.status == "Waiting") {
+			waitingCount++;
+			waitTimeSum += p.waitTime;
+		}
+		else if (p.status == "Admitted") {
+			admit++;
+		}
+	}
+	double avgTime = 0;
+	if(waitingCount > 0) {
+		avgTime = (double)waitTimeSum / waitingCount;
+	}
+	cout << "===== Emergency Room Summary =====\n";
+	cout << "Total Patients: " << totalptents << endl;
+	cout << "Patinets Admitted: " << admit << endl;
+	cout << "Patients Waiting: " << waitingCount << endl;
+	cout << " Average Wait Time: " << fixed << setprecision(2) << avgTime << " minutes\n";
+	cout << "==================================\n";	
+}
+
+
+P
